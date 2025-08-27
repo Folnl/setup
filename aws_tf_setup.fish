@@ -4,8 +4,10 @@ function check_aws_cli
     if type -q aws
         echo "✅ AWS CLI já está instalado: (aws --version)"
         aws --version
+        return 0
     else
         echo "❌ AWS CLI não está instalado."
+        return 1
     end
 end
 
@@ -42,11 +44,15 @@ end
 # ==========================
 # Execução
 # ==========================
-check_aws_cli
+if check_aws_cli
+    configure_aws
+else
+    echo "⚠️ Pulando configuração do AWS CLI porque ele não está instalado."
+end
+
 check_terraform
-configure_aws
 
 echo ""
-echo "⚡️ Tudo pronto (se os binários estiverem instalados)!"
+echo "⚡️ Script finalizado!"
 echo " - AWS CLI: (aws --version)"
 echo " - Terraform: (terraform -version)"
