@@ -11,7 +11,8 @@ set apps \
 # Lista de apps para instalar apenas pelos repositórios oficiais
 set repo_apps \
   aws-cli-v2 \
-  terraform
+  terraform \
+  podman
 
 # Lista de aplicações Flatpak a serem instaladas
 set flatpak_apps \
