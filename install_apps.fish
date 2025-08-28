@@ -8,6 +8,11 @@ set apps \
   zed \
   mise
 
+# Lista de apps para instalar apenas pelos repositórios oficiais
+set repo_apps \
+  aws-cli-v2 \
+  terraform
+
 # Lista de aplicações Flatpak a serem instaladas
 set flatpak_apps \
   app.zen_browser.zen \
@@ -35,6 +40,16 @@ for app in $apps
     else
         echo "📦 Instalando $app..."
         yay -S $app --noconfirm
+    end
+end
+
+# Instala pacotes dos repositórios oficiais
+for app in $repo_apps
+    if yay -Qi $app > /dev/null
+        echo "✅ $app já está instalado (repo)."
+    else
+        echo "📦 Instalando $app dos repositórios oficiais..."
+        yay -S --repo $app --noconfirm
     end
 end
 
