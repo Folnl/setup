@@ -1,6 +1,6 @@
 #!/usr/bin/env fish
 
-# Lista de aplicações a serem instaladas
+# Lista de aplicações a serem instaladas via AUR helper
 set apps \
   brave-bin \
   cursor-bin \
@@ -19,38 +19,44 @@ set flatpak_apps \
   app.zen_browser.zen \
   io.dbeaver.DBeaverCommunity
 
-# Verifica se yay está instalado
-if not type -q yay
-    echo "❌ yay não está instalado. Por favor, instale o yay antes de executar este script."
+# Detecta o AUR helper disponível: yay ou paru
+set AUR_HELPER ""
+if type -q yay
+    set AUR_HELPER yay
+else if type -q paru
+    set AUR_HELPER paru
+else
+    echo "❌ Nenhum AUR helper encontrado. Por favor, instale o 'yay' ou 'paru'."
     exit 1
 end
 
+# Verifica se flatpak está instalado
 if not type -q flatpak
     echo "❌ flatpak não está instalado. Instalando flatpak..."
     sudo pacman -S flatpak --noconfirm
 end
 
-# Atualiza os repositórios
-echo "🔄 Atualizando pacotes..."
-yay -Syu --noconfirm
+# Atualiza os pacotes
+echo "🔄 Atualizando pacotes com $AUR_HELPER..."
+$AUR_HELPER -Syu --noconfirm
 
-# Instala cada aplicação
+# Instala cada aplicação via AUR helper
 for app in $apps
-    if yay -Qi $app > /dev/null
+    if $AUR_HELPER -Qi $app > /dev/null
         echo "✅ $app já está instalado."
     else
         echo "📦 Instalando $app..."
-        yay -S $app --noconfirm
+        $AUR_HELPER -S $app --noconfirm
     end
 end
 
 # Instala pacotes dos repositórios oficiais
 for app in $repo_apps
-    if yay -Qi $app > /dev/null
+    if $AUR_HELPER -Qi $app > /dev/null
         echo "✅ $app já está instalado (repo)."
     else
         echo "📦 Instalando $app dos repositórios oficiais..."
-        yay -S --repo $app --noconfirm
+        sudo pacman -S $app --noconfirm
     end
 end
 
