@@ -1,0 +1,8 @@
+alias cat="bat"
+alias ls="exa --icons --group-directories-first"
+alias ll="exa -lh --icons --group-directories-first"
+alias la="exa -lha --icons --group-directories-first"
+alias grep="rg"
+alias find="fd"
+alias ..="cd .."
+alias ...="cd ../.."
