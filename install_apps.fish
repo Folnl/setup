@@ -6,7 +6,16 @@ set apps \
   cursor-bin \
   neovim \
   zed \
-  mise
+  mise \
+  fisher \
+  bat \
+  exa \
+  ripgrep \
+  fd \
+  tmux \
+  starship \
+  tealdeer \
+  zellij
 
 # Lista de apps para instalar apenas pelos repositórios oficiais
 set repo_apps \
