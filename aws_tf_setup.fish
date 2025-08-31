@@ -23,7 +23,7 @@ end
 function configure_aws
     echo "🔑 Configurando AWS CLI..."
     read -P "AWS Access Key ID: " aws_access_key
-    read -P "AWS Secret Access Key: " aws_secret_key
+    read -s -P "AWS Secret Access Key: " aws_secret_key
     read -P "Região padrão (ex: us-east-1): " aws_region
 
     mkdir -p ~/.aws
