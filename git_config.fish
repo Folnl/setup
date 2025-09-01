@@ -1,6 +1,12 @@
 #!/usr/bin/env fish
 
-function setup_git_identity --argument name email keyfile host
+function setup_git_identity
+    read -P "👤 Nome: " name
+    read -P "📧 Email: " email
+    read -P "🔑 Nome do arquivo da chave (ex: id_ed25519_pessoal): " keyfile
+    read -P "📂 Diretório de trabalho (ex: ~/workspace/pessoal): " workdir
+    read -P "🌐 Host (apelido para o GitHub, ex: github-pessoal): " host
+
     echo "🔑 Gerando chave SSH para $name..."
     ssh-keygen -t ed25519 -C $email -f ~/.ssh/$keyfile -N ""
 
@@ -13,51 +19,25 @@ Host $host
     IdentitiesOnly yes
 " >> ~/.ssh/config
 
-    echo "✅ Adicionando chave ao ssh-agent..."
-    eval (ssh-agent -c)
-    ssh-add ~/.ssh/$keyfile
+    echo "⚙️ Criando configuração Git separada em ~/.gitconfig-$host"
+    echo "
+[user]
+    name = $name
+    email = $email
+[core]
+    sshCommand = ssh -i ~/.ssh/$keyfile -F /dev/null
+" > ~/.gitconfig-$host
+
+    echo "⚙️ Adicionando includeIf no ~/.gitconfig"
+    git config --global includeIf."gitdir:$workdir/".path "~/.gitconfig-$host"
+
+    echo "✅ Configuração finalizada para $name em $workdir"
 end
 
-# ==========================
-# Perguntar dados no terminal
-# ==========================
+echo "=== Configurando primeira conta ==="
+setup_git_identity
 
-echo "=== Conta Pessoal ==="
-read -P "Nome pessoal: " personal_name
-read -P "Email pessoal: " personal_email
+echo "=== Configurando segunda conta ==="
+setup_git_identity
 
-echo "=== Conta Trabalho ==="
-read -P "Nome trabalho: " work_name
-read -P "Email trabalho: " work_email
-
-# ==========================
-# Configuração das contas
-# ==========================
-
-# Conta Pessoal -> global
-setup_git_identity $personal_name $personal_email "id_ed25519_pessoal" "github-pessoal"
-git config --global user.name $personal_name
-git config --global user.email $personal_email
-
-# Conta Trabalho -> somente chave + helper
-setup_git_identity $work_name $work_email "id_ed25519_trabalho" "github-trabalho"
-
-# ==========================
-# Helper para repositórios de trabalho
-# ==========================
-function git-work-identity
-    echo "⚙️ Configurando identidade de trabalho neste repositório..."
-    git config user.name "$work_name"
-    git config user.email "$work_email"
-    echo "✅ Agora este repositório usa sua conta de trabalho!"
-end
-
-echo ""
-echo "⚡️ Finalizado!"
-echo ""
-echo "➡️ Para repositórios pessoais (default):"
-echo "   git clone git@github-pessoal:usuario/repositorio.git"
-echo ""
-echo "➡️ Para repositórios de trabalho:"
-echo "   git clone git@github-trabalho:empresa/repositorio.git"
-echo "   cd repositorio && git-work-identity"
+echo "🎉 Pronto! Agora o Git escolhe a identidade certa automaticamente dependendo do diretório."
